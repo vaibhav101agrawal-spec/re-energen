@@ -27,7 +27,7 @@ export default function ProductsPage() {
   const filteredProducts = products.filter((p) => {
     // defensive: support name, title or short fields
     const searchable =
-      (p.name ?? p.short ?? p.shortDescription ?? "").toString().toLowerCase()
+      (p.name ?? p.shortDescription ?? "").toString().toLowerCase()
     return searchable.includes((search ?? "").toLowerCase())
   })
 
