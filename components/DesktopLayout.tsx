@@ -1,0 +1,424 @@
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Phone, MapPin, Mail } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
+
+interface DesktopLayoutProps {
+  PHONE_1: string
+  PHONE_2: string
+  EMAIL_1: string
+  WHATSAPP: string
+}
+
+export function DesktopLayout({ PHONE_1, PHONE_2, EMAIL_1 , WHATSAPP }: DesktopLayoutProps) {
+  const { language } = useLanguage()
+  const isEn = language === "en"
+
+  const [callbackOpen, setCallbackOpen] = useState(false)
+  const [cbName, setCbName] = useState("")
+  const [cbPhone, setCbPhone] = useState("")
+  const [cbSending, setCbSending] = useState(false)
+  const [cbSuccess, setCbSuccess] = useState(false)
+
+  async function submitCallback(e: React.FormEvent) {
+    e.preventDefault()
+    if (!cbPhone) return
+    setCbSending(true)
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: cbName || "Callback request",
+          phone: cbPhone,
+          source: "homepage-request-site-visit",
+        }),
+      })
+      setCbSuccess(true)
+      setCbName("")
+      setCbPhone("")
+      setTimeout(() => {
+        setCbSuccess(false)
+        setCallbackOpen(false)
+      }, 1400)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setCbSending(false)
+    }
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Hero */}
+      <section className="bg-[linear-gradient(180deg,#f3f7f5,transparent)] py-16">
+        <div className="max-w-6xl mx-auto px-8 grid grid-cols-2 gap-12 items-center">
+          <div>
+            <h1 className="text-5xl font-extrabold leading-tight text-foreground">
+              {isEn ? "Cut your electricity bill\nSwitch to solar today." : "अपना बिजली का बिल घटाएँ\nआज ही सोलर अपनाएँ।"}
+            </h1>
+            <p className="mt-6 text-lg text-muted-foreground max-w-xl">
+              {isEn
+                ? "Reliable installations, government-approved equipment, and local support. Free site visit available."
+                : "भरोसेमंद इंस्टॉलेशन, सरकारी मान्यता प्राप्त उपकरण और लोकल सपोर्ट\nनि:शुल्क साइट विज़िट उपलब्ध।"}
+            </p>
+
+            <div className="mt-8 flex gap-4">
+              <a href={`tel:${PHONE_1}`}>
+                <Button className="bg-primary hover:bg-primary/90 flex items-center gap-3 px-8 text-base">
+                  <Phone className="w-5 h-5" />
+                  {isEn ? "Call Now" : "हमें कॉल करें"}
+                </Button>
+              </a>
+
+              <button onClick={() => setCallbackOpen(true)}>
+                <Button variant="outline" className="px-8 text-base bg-transparent">
+                  {isEn ? "Request Free Site Visit" : "नि:शुल्क साइट विज़िट"}
+                </Button>
+              </button>
+            </div>
+
+            <div className="mt-8 bg-background/60 border border-border rounded-lg p-6 inline-flex gap-12">
+              <div>
+                <div className="font-bold text-2xl">50+</div>
+                <div className="text-sm text-muted-foreground">{isEn ? "Happy customers" : "संतुष्ट ग्राहक"}</div>
+              </div>
+              <div>
+                <div className="font-bold text-2xl">24/7</div>
+                <div className="text-sm text-muted-foreground">{isEn ? "Support" : "सपोर्ट"}</div>
+              </div>
+            </div>
+          </div>
+
+          <Image
+            src="/family-with-solar.png"
+            alt={isEn ? "Family with solar panels" : "परिवार सौर पैनलों के साथ"}
+            width={450}
+            height={450}
+            priority
+            quality={85}
+            className="w-full h-auto object-cover rounded-lg shadow-xl"
+          />
+        </div>
+      </section>
+
+      {/* Why Solar + Chart + How It Works */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-8 grid grid-cols-3 gap-12">
+          <div>
+            <h2 className="text-3xl font-bold mb-6">{isEn ? "Why Solar?" : "सोलर क्यों?"}</h2>
+            <ul className="space-y-4 text-base">
+              <li className="flex items-start gap-3">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <span>{isEn ? "Save big on your electricity bills" : "बिजली बिल में भारी बचत"}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <span>{isEn ? "Up to ₹1,08,000 government subsidy" : "₹1,08,000 तक सरकारी सब्सिडी"}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <span>{isEn ? "24x7 power availability" : "24x7 बिजली की उपलब्धता"}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <span>{isEn ? "No fear of rising electricity rates" : "बिजली की दरें बढ़ने का डर खत्म"}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <span>{isEn ? "Earn from selling excess power" : "अतिरिक्त बिजली बेचकर कमाई"}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="bg-white border border-border rounded-lg p-6">
+              <div className="font-semibold text-xl mb-4 text-center">{isEn ? "Before / After" : "पहले / बाद"}</div>
+              <Image
+                src="/before-after-chart.png"
+                alt={isEn ? "Before After chart" : "पहले बाद चार्ट"}
+                width={500}
+                height={300}
+                quality={80}
+                loading="lazy"
+                className="w-full h-64 object-contain"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-bold mb-6">{isEn ? "How It Works" : "प्रक्रिया"}</h2>
+            <div className="space-y-5">
+              {[
+                {
+                  emoji: "🔎",
+                  title: isEn ? "Site Inspection" : "साइट निरीक्षण",
+                  desc: isEn ? "Free site visit & custom quote" : "नि:शुल्क साइट विज़िट और कस्टम कोट",
+                },
+                {
+                  emoji: "📄",
+                  title: isEn ? "Paperwork & Approval" : "फॉर्म और अप्रूवल",
+                  desc: isEn ? "We handle paperwork & approvals" : "हम फॉर्म और अप्रूवल संभालते हैं",
+                },
+                {
+                  emoji: "🔧",
+                  title: isEn ? "Installation" : "इंस्टॉलेशन",
+                  desc: isEn ? "Certified installers & fast setup" : "प्रमाणित इंस्टॉलर, तेज़ सेटअप",
+                },
+                {
+                  emoji: "💡",
+                  title: isEn ? "Savings Begin!" : "बचत शुरू",
+                  desc: isEn ? "Start saving from day one" : "दिन 1 से ही बचत शुरू",
+                },
+              ].map((step, i) => (
+                <div key={i} className="flex items-start gap-4">
+                  <div className="bg-background border border-border w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">
+                    {step.emoji}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-base">{step.title}</div>
+                    <div className="text-sm text-muted-foreground">{step.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Logos */}
+      <section className="py-14 px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto text-center">
+          <h3 className="text-3xl font-bold mb-8">{isEn ? "Our Solar Range" : "हमारे सोलर ब्रैंड"}</h3>
+
+          <div className="grid grid-cols-3 gap-8 items-center justify-items-center mb-10">
+            <Image
+              src="/waaree-logo.png"
+              alt="Waaree"
+              width={160}
+              height={70}
+              quality={80}
+              loading="lazy"
+              className="max-h-16 object-contain"
+            />
+            <Image
+              src="/tata-logo.png"
+              alt="TATA"
+              width={220}
+              height={90}
+              quality={80}
+              loading="lazy"
+              className="max-h-14 object-contain"
+            />
+            <Image
+              src="/nova-logo.png"
+              alt="Nova"
+              width={140}
+              height={60}
+              quality={80}
+              loading="lazy"
+              className="max-h-16 object-contain"
+            />
+          </div>
+
+          <div className="text-base font-medium text-muted-foreground mb-8">
+            {isEn ? "All bank finance available" : "सभी बैंक फाइनेंस उपलब्ध"}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+            <Image
+              src="/sbi-logo.png"
+              alt="SBI"
+              width={100}
+              height={40}
+              quality={80}
+              loading="lazy"
+              className="h-12 w-auto object-contain"
+            />
+            <Image
+              src="/pnb-logo.png"
+              alt="PNB"
+              width={100}
+              height={40}
+              quality={80}
+              loading="lazy"
+              className="h-12 w-auto object-contain"
+            />
+            <Image
+              src="/bob-logo.png"
+              alt="Bank of Baroda"
+              width={100}
+              height={40}
+              quality={80}
+              loading="lazy"
+              className="h-12 w-auto object-contain"
+            />
+            <Image
+              src="/canara-logo.png"
+              alt="Canara Bank"
+              width={100}
+              height={40}
+              quality={80}
+              loading="lazy"
+              className="h-12 w-auto object-contain"
+            />
+            <Image
+              src="/unionbank-logo.png"
+              alt="Union Bank"
+              width={100}
+              height={40}
+              quality={80}
+              loading="lazy"
+              className="h-12 w-auto object-contain"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Our Promise */}
+      <section className="py-16">
+        <div className="max-w-5xl mx-auto px-8">
+          <h3 className="text-3xl font-bold text-center mb-8">{isEn ? "Our Promise" : "हमारा वादा"}</h3>
+
+          <Card className="p-8">
+            <ul className="grid grid-cols-2 gap-6 text-base">
+              <li className="flex items-start gap-4">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                {isEn ? "30-year panel warranty" : "30 वर्षों की पैनल वारंटी"}
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                {isEn ? "Reliable local installation team" : "भरोसेमंद लोकल इंस्टॉलेशन टीम"}
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                {isEn ? "Regular maintenance and support" : "नियमित रखरखाव और सपोर्ट"}
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                {isEn ? "Honest guidance, no hidden costs" : "इमानदार मार्गदर्शन, कोई छिपा खर्च नहीं"}
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                {isEn ? "Complete subsidy and net-metering help" : "सब्सिडी और नेट-मीटरिंग में मदद"}
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-3 h-3 bg-primary rounded-full mt-2 flex-shrink-0" />
+                {isEn ? "High-quality, government-approved equipment" : "उच्च गुणवत्ता वाले, सरकारी-स्वीकृत उपकरण"}
+              </li>
+            </ul>
+          </Card>
+        </div>
+      </section>
+
+      {/* Contact / CTA */}
+      <section className="bg-primary text-primary-foreground py-16">
+        <div className="max-w-5xl mx-auto px-8">
+          <div className="grid grid-cols-3 gap-8 items-start">
+            <div className="col-span-2">
+              <h3 className="text-3xl font-bold">{isEn ? "Free Site Visit" : "नि:शुल्क साइट विज़िट"}</h3>
+              <p className="mt-4 text-base">
+                {isEn
+                  ? "Call or request a free site visit - we will provide a custom quote after inspection."
+                  : "कॉल करें या नि:शुल्क साइट विज़िट का अनुरोध करें - निरीक्षण के बाद हम कस्टम कोट देंगे।"}
+              </p>
+
+              <div className="mt-6 flex gap-4">
+                <a href={`tel:${PHONE_1}`}>
+                  <Button className="bg-white text-primary font-semibold flex items-center gap-3 px-8 text-base shadow-sm hover:bg-white/90 transition">
+                    <Phone className="w-5 h-5" /> {isEn ? "Call Now" : "अभी कॉल करें"} • {PHONE_1}
+                  </Button>
+                </a>
+
+                <a href={WHATSAPP} target="_blank" rel="noreferrer">
+                  <Button
+                    variant="outline"
+                    className="bg-white text-primary font-semibold flex items-center gap-3 px-8 text-base shadow-sm hover:bg-white/90 transition"
+                  >
+                    {isEn ? "Chat on WhatsApp" : "WhatsApp पर चैट करें"}
+                  </Button>
+                </a>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-6 border border-border text-foreground space-y-4">
+              <div className="flex items-start gap-4">
+                <MapPin className="w-6 h-6 text-primary flex-shrink-0" />
+                <div>
+                  <div className="font-semibold text-base">{isEn ? "Visit Us" : "हमसे मिलें"}</div>
+                  <div className="text-sm text-muted-foreground leading-relaxed">
+                    5th Floor, Currency Tower, V.I.P. Road, Raipur 492001
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <Mail className="w-6 h-6 text-primary flex-shrink-0" />
+                <div className="text-sm space-y-1">
+                  <a href={`mailto:${EMAIL_1}`} className="hover:underline break-words block">
+                    {EMAIL_1}
+                  </a>
+               
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Callback Modal */}
+      {callbackOpen && (
+        <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/40 p-8">
+          <form onSubmit={submitCallback} className="w-full max-w-md bg-background border border-border rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold">{isEn ? "Request Free Site Visit" : "नि:शुल्क साइट विज़िट अनुरोध"}</h3>
+              <button
+                type="button"
+                onClick={() => setCallbackOpen(false)}
+                aria-label="Close"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+
+            <label className="block text-sm text-muted-foreground mb-2">{isEn ? "Name" : "नाम (वैकल्पिक)"}</label>
+            <input
+              value={cbName}
+              onChange={(e) => setCbName(e.target.value)}
+              className="w-full mb-4 px-4 py-2 border border-border rounded-lg"
+              placeholder={isEn ? "Your name (optional)" : "आपका नाम (वैकल्पिक)"}
+            />
+
+            <label className="block text-sm text-muted-foreground mb-2">{isEn ? "Phone" : "फ़ोन"}</label>
+            <input
+              value={cbPhone}
+              onChange={(e) => setCbPhone(e.target.value)}
+              required
+              className="w-full mb-4 px-4 py-2 border border-border rounded-lg"
+              placeholder={isEn ? "Mobile number" : "मोबाइल नंबर"}
+            />
+
+            <div className="flex gap-4">
+              <Button type="submit" className="flex-1" disabled={cbSending}>
+                {cbSending ? (isEn ? "Sending..." : "भेज रहे हैं...") : isEn ? "Request Visit" : "अनुरोध भेजें"}
+              </Button>
+              <Button variant="outline" type="button" onClick={() => setCallbackOpen(false)}>
+                {isEn ? "Cancel" : "रद्द करें"}
+              </Button>
+            </div>
+
+            {cbSuccess && (
+              <div className="mt-4 text-sm text-green-600">{isEn ? "Request sent!" : "अनुरोध भेज दिया गया!"}</div>
+            )}
+          </form>
+        </div>
+      )}
+    </div>
+  )
+}
