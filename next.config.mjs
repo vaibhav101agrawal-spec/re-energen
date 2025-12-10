@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  images: {
-    unoptimized: true,
-  },
-}
+  output: 'export',          // Needed for GitHub Pages
+  basePath: '/re-energen',   // must match your repo name
+  assetPrefix: '/re-energen/',
+};
 
-export default nextConfig
+export default nextConfig;
